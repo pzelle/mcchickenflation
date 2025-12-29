@@ -12,8 +12,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 const PORT = process.env.PORT || 3000;
-const DEFAULT_DATA_PATH = path.join(__dirname, "..", "data", "mcchicken_prices.csv");
-const DATA_PATH = process.env.MCCHICKEN_CSV_PATH;
+const DATA_PATH = process.env.MCCHICKEN_CSV_PATH || path.join(__dirname, "..", "data", "mcchicken_prices.csv");
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || "")
   .split(",")
   .map((origin) => origin.trim())
@@ -97,7 +96,7 @@ const loadPriceData = async () => {
     trim: true
   });
 
-  const normalized = records.map((record) => ({
+  return records.map((record) => ({
     year: normalizeNumber(record.year ?? record.Year),
     available: normalizeBoolean(record.available ?? record.Available ?? record.Availability),
     minPrice: normalizeNumber(
@@ -112,12 +111,6 @@ const loadPriceData = async () => {
     sourceValueMenuAnchors: record.source_value_menu_anchors ?? record.Source_ValueMenu_Anchors ?? null,
     sourceRecentPricingAnchors: record.source_recent_pricing_anchors ?? record.Source_RecentPricing_Anchors ?? null
   }));
-
-  if (usedPath && usedPath !== DEFAULT_DATA_PATH) {
-    console.info(`Loaded CSV data from ${usedPath}`);
-  }
-
-  return normalized;
 };
 
 app.use(express.static(path.join(__dirname, "..", "public")));
