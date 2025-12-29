@@ -77,9 +77,13 @@ const loadPriceData = async () => {
 
   return records.map((record) => ({
     year: normalizeNumber(record.year ?? record.Year),
-    available: normalizeBoolean(record.available ?? record.Available),
-    minPrice: normalizeNumber(record.min_price ?? record.Min_Price ?? record["Minimum Price"]),
-    maxPrice: normalizeNumber(record.max_price ?? record.Max_Price ?? record["Maximum Price"]),
+    available: normalizeBoolean(record.available ?? record.Available ?? record.Availability),
+    minPrice: normalizeNumber(
+      record.min_price ?? record.Min_Price ?? record["Minimum Price"] ?? record.Price_Low_USD
+    ),
+    maxPrice: normalizeNumber(
+      record.max_price ?? record.Max_Price ?? record["Maximum Price"] ?? record.Price_High_USD
+    ),
     notes: record.notes ?? record.Notes ?? null,
     sourceHistory: record.source_history ?? record.Source_History ?? null,
     sourceCpiContext: record.source_cpi_context ?? record.Source_CPI_Context ?? null,
@@ -87,6 +91,8 @@ const loadPriceData = async () => {
     sourceRecentPricingAnchors: record.source_recent_pricing_anchors ?? record.Source_RecentPricing_Anchors ?? null
   }));
 };
+
+app.use(express.static(path.join(__dirname, "..", "public")));
 
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });
@@ -108,6 +114,21 @@ app.get("/api/prices", async (_req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`McChickenflation API listening on http://localhost:${PORT}`);
+app.get("/about", (_req, res) => {
+  res.sendFile(path.join(__dirname, "..", "public", "about.html"));
 });
+
+app.get("/", (_req, res) => {
+  res.sendFile(path.join(__dirname, "..", "public", "index.html"));
+});
+
+const isDirectRun = process.argv[1] && path.resolve(process.argv[1]) === __filename;
+
+if (isDirectRun && !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`McChickenflation API listening on http://localhost:${PORT}`);
+  });
+}
+
+export { app };
+export default app;
