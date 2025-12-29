@@ -1,0 +1,3 @@
+year,available,min_price,max_price,Notes,Source_History,Source_CPI_Context,Source_ValueMenu_Anchors,Source_RecentPricing_Anchors
+1980,no,,,"Not available nationwide yet.","https://example.com/history","https://example.com/cpi","https://example.com/value-menu","https://example.com/recent"
+1990,yes,0.89,0.99,"Expanded availability.","https://example.com/history-1990","https://example.com/cpi-1990","https://example.com/value-menu-1990","https://example.com/recent-1990"
