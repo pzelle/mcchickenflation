@@ -1,5 +1,11 @@
 {
+  "version": 2,
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "{public,data}/**"
+    }
+  },
   "rewrites": [
-    { "source": "/(.*)", "destination": "/api" }
+    { "source": "/(.*)", "destination": "/api/index.js" }
   ]
 }
