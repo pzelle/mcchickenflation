@@ -1,0 +1,179 @@
+:root {
+  color-scheme: light;
+  --gold: #ffd700;
+  --red: #db1020;
+  --cream: #f9f5f5;
+  --green: #27742d;
+  --black: #111111;
+  --shadow: 0 20px 45px rgba(17, 17, 17, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Roboto", Arial, sans-serif;
+  background: var(--cream);
+  color: var(--black);
+}
+
+.site-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 2.5rem 6vw 1.5rem;
+}
+
+.site-header.minimal {
+  align-items: center;
+}
+
+.title-group {
+  max-width: 680px;
+}
+
+.brand-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--gold);
+  color: var(--black);
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.site-title {
+  margin: 0.75rem 0 0.4rem;
+  font-family: "Lovin Sans", "McDonald's", "Montserrat", Arial, sans-serif;
+  font-size: clamp(2.6rem, 4vw, 3.8rem);
+  font-weight: 800;
+  color: var(--red);
+}
+
+.link-title {
+  text-decoration: none;
+}
+
+.site-subtitle {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: #2b2b2b;
+}
+
+.site-nav a {
+  font-family: "Montserrat", Arial, sans-serif;
+  font-weight: 700;
+  color: var(--green);
+  text-decoration: none;
+  background: rgba(39, 116, 45, 0.1);
+  padding: 0.6rem 1.2rem;
+  border-radius: 999px;
+  transition: all 0.2s ease;
+}
+
+.site-nav a:hover {
+  background: rgba(39, 116, 45, 0.2);
+}
+
+.content {
+  padding: 0 6vw 3rem;
+}
+
+.chart-card,
+.about-card {
+  background: white;
+  border-radius: 24px;
+  padding: 2rem 2.5rem 2.5rem;
+  box-shadow: var(--shadow);
+}
+
+.chart-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.chart-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--black);
+}
+
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.legend-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--red);
+  margin-right: 0.4rem;
+}
+
+.legend-emoji {
+  margin-right: 0.4rem;
+}
+
+.chart-wrapper {
+  position: relative;
+  min-height: 420px;
+}
+
+.chart-error {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+  padding: 2rem;
+  border-radius: 16px;
+  background: rgba(219, 16, 32, 0.08);
+  color: var(--black);
+  font-weight: 500;
+}
+
+.about-card h2 {
+  margin-top: 0;
+  color: var(--red);
+}
+
+.about-card p {
+  line-height: 1.7;
+}
+
+.about-card a {
+  color: var(--green);
+  font-weight: 600;
+}
+
+.site-footer {
+  padding: 1.5rem 6vw 2.5rem;
+  font-size: 0.95rem;
+  color: #444;
+}
+
+@media (max-width: 900px) {
+  .site-header {
+    flex-direction: column;
+  }
+
+  .chart-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
