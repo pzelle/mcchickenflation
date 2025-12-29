@@ -67,7 +67,28 @@ const normalizeNumber = (value) => {
 };
 
 const loadPriceData = async () => {
-  const raw = await fs.readFile(DATA_PATH, "utf-8");
+  const candidatePaths = [
+    DATA_PATH,
+    DEFAULT_DATA_PATH,
+    path.join(process.cwd(), "data", "mcchicken_prices.csv")
+  ].filter(Boolean);
+
+  let raw;
+  let usedPath;
+
+  for (const candidate of candidatePaths) {
+    try {
+      raw = await fs.readFile(candidate, "utf-8");
+      usedPath = candidate;
+      break;
+    } catch (error) {
+      console.warn(`Unable to read CSV at ${candidate}`, error);
+    }
+  }
+
+  if (!raw) {
+    throw new Error(`Unable to read CSV from any known path: ${candidatePaths.join(", ")}`);
+  }
 
   const records = parse(raw, {
     columns: true,
