@@ -23,6 +23,28 @@ const buildSources = (entry) => {
   return sources || "No sources listed.";
 };
 
+const linkifyText = (text) => {
+  if (!text) {
+    return "";
+  }
+
+  const urlRegex = /(https?:\/\/[^\s;]+)/g;
+  return text.replace(urlRegex, (url) => `<a href="${url}" target="_blank" rel="noreferrer">${url}</a>`);
+};
+
+const ensureTooltipElement = (chart) => {
+  const existing = chart.canvas.parentNode.querySelector(".chart-tooltip");
+  if (existing) {
+    return existing;
+  }
+
+  const tooltip = document.createElement("div");
+  tooltip.className = "chart-tooltip";
+  tooltip.innerHTML = "<div class=\"chart-tooltip-content\"></div>";
+  chart.canvas.parentNode.appendChild(tooltip);
+  return tooltip;
+};
+
 const missingMarkerPlugin = {
   id: "missingMarkerPlugin",
   afterDatasetsDraw(chart, _args, pluginOptions) {
@@ -87,7 +109,46 @@ const buildChart = (rows) => {
     };
   });
 
-  return new Chart(chartCanvas, {
+  let tooltipLocked = false;
+  let lockedIndex = null;
+
+  const externalTooltipHandler = (context) => {
+    const { chart, tooltip } = context;
+    const tooltipEl = ensureTooltipElement(chart);
+    const content = tooltipEl.querySelector(".chart-tooltip-content");
+
+    if (tooltip.opacity === 0) {
+      if (!tooltipLocked) {
+        tooltipEl.style.opacity = 0;
+      }
+      return;
+    }
+
+    const dataPoint = tooltip.dataPoints?.[0];
+    if (!dataPoint) {
+      return;
+    }
+
+    const raw = dataPoint.raw;
+    const year = raw.x ? String(raw.x) : "";
+    const notes = raw.notes ? linkifyText(raw.notes) : "None";
+    const sources = raw.sources ? linkifyText(raw.sources) : "No sources listed.";
+    const range = `Range: ${formatPrice(raw.minPrice)} – ${formatPrice(raw.maxPrice)}`;
+
+    content.innerHTML = `
+      <div class="tooltip-title">${year}</div>
+      <div class="tooltip-range">${range}</div>
+      <div class="tooltip-section"><strong>Notes:</strong> ${notes}</div>
+      <div class="tooltip-section"><strong>Sources:</strong> ${sources}</div>
+    `;
+
+    const { offsetLeft: positionX, offsetTop: positionY } = chart.canvas;
+    tooltipEl.style.opacity = 1;
+    tooltipEl.style.left = `${positionX + tooltip.caretX}px`;
+    tooltipEl.style.top = `${positionY + tooltip.caretY}px`;
+  };
+
+  const chartInstance = new Chart(chartCanvas, {
     type: "line",
     data: {
       datasets: [
@@ -128,18 +189,8 @@ const buildChart = (rows) => {
           }
         },
         tooltip: {
-          callbacks: {
-            label: (context) => {
-              const value = context.raw;
-              return `Range: ${formatPrice(value.minPrice)} – ${formatPrice(value.maxPrice)}`;
-            },
-            afterLabel: (context) => {
-              const value = context.raw;
-              const notes = value.notes ? `Notes: ${value.notes}` : "Notes: None";
-              const sources = `Sources: ${value.sources}`;
-              return [notes, sources];
-            }
-          }
+          enabled: false,
+          external: externalTooltipHandler
         },
         missingMarkerPlugin: {
           missingYears: missingRows.map((row) => row.year)
@@ -188,6 +239,33 @@ const buildChart = (rows) => {
     },
     plugins: [missingMarkerPlugin]
   });
+
+  chartCanvas.addEventListener("click", (event) => {
+    const elements = chartInstance.getElementsAtEventForMode(event, "nearest", { intersect: true }, true);
+    if (elements.length > 0) {
+      const pointIndex = elements[0].index;
+      if (tooltipLocked && lockedIndex === pointIndex) {
+        tooltipLocked = false;
+        lockedIndex = null;
+      } else {
+        tooltipLocked = true;
+        lockedIndex = pointIndex;
+      }
+    } else {
+      tooltipLocked = false;
+      lockedIndex = null;
+    }
+
+    const tooltip = chartInstance.tooltip;
+    if (tooltipLocked && elements.length > 0) {
+      tooltip.setActiveElements(elements, { x: event.offsetX, y: event.offsetY });
+    } else {
+      tooltip.setActiveElements([], { x: 0, y: 0 });
+    }
+    chartInstance.update();
+  });
+
+  return chartInstance;
 };
 
 const loadData = async () => {

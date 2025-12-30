@@ -147,6 +147,45 @@ body {
   font-weight: 500;
 }
 
+.chart-tooltip {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  background: #fffaf0;
+  border: 1px solid rgba(17, 17, 17, 0.15);
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(17, 17, 17, 0.18);
+  padding: 0.85rem 1rem;
+  max-width: 320px;
+  pointer-events: auto;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 5;
+}
+
+.chart-tooltip-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--black);
+}
+
+.tooltip-title {
+  font-family: "Montserrat", Arial, sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--red);
+}
+
+.tooltip-range {
+  font-weight: 600;
+}
+
+.tooltip-section a {
+  color: var(--green);
+  word-break: break-word;
+}
+
 .about-card h2 {
   margin-top: 0;
   color: var(--red);
