@@ -137,6 +137,10 @@ const loadPriceData = async () => {
 };
 
 app.use(express.static(path.join(__dirname, "..", "public")));
+app.use(
+  "/vendor",
+  express.static(path.join(__dirname, "..", "node_modules", "chart.js", "dist"))
+);
 
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });
