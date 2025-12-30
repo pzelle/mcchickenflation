@@ -51,24 +51,41 @@ const missingMarkerPlugin = {
 const buildChart = (rows) => {
   const availableRows = rows.filter((row) => row.available !== false && row.minPrice !== null && row.maxPrice !== null);
   const missingRows = rows.filter((row) => row.available === false || row.minPrice === null || row.maxPrice === null);
+  const allYears = rows.map((row) => row.year).sort((a, b) => a - b);
 
-  const minSeries = availableRows.map((row) => ({
-    x: row.year,
-    y: row.minPrice,
-    notes: row.notes,
-    sources: buildSources(row),
-    minPrice: row.minPrice,
-    maxPrice: row.maxPrice
-  }));
+  const rowByYear = new Map(rows.map((row) => [row.year, row]));
 
-  const maxSeries = availableRows.map((row) => ({
-    x: row.year,
-    y: row.maxPrice,
-    notes: row.notes,
-    sources: buildSources(row),
-    minPrice: row.minPrice,
-    maxPrice: row.maxPrice
-  }));
+  const minSeries = allYears.map((year) => {
+    const row = rowByYear.get(year);
+    if (!row || row.available === false || row.minPrice === null || row.maxPrice === null) {
+      return { x: year, y: null };
+    }
+
+    return {
+      x: year,
+      y: row.minPrice,
+      notes: row.notes,
+      sources: buildSources(row),
+      minPrice: row.minPrice,
+      maxPrice: row.maxPrice
+    };
+  });
+
+  const maxSeries = allYears.map((year) => {
+    const row = rowByYear.get(year);
+    if (!row || row.available === false || row.minPrice === null || row.maxPrice === null) {
+      return { x: year, y: null };
+    }
+
+    return {
+      x: year,
+      y: row.maxPrice,
+      notes: row.notes,
+      sources: buildSources(row),
+      minPrice: row.minPrice,
+      maxPrice: row.maxPrice
+    };
+  });
 
   return new Chart(chartCanvas, {
     type: "line",
@@ -82,7 +99,8 @@ const buildChart = (rows) => {
           pointBackgroundColor: palette.green,
           pointRadius: 3,
           tension: 0.25,
-          fill: false
+          fill: false,
+          spanGaps: false
         },
         {
           label: "Max price",
@@ -92,7 +110,8 @@ const buildChart = (rows) => {
           pointBackgroundColor: palette.red,
           pointRadius: 3,
           tension: 0.25,
-          fill: "-1"
+          fill: "-1",
+          spanGaps: false
         }
       ]
     },
@@ -131,7 +150,8 @@ const buildChart = (rows) => {
           type: "linear",
           ticks: {
             color: palette.black,
-            stepSize: 5
+            stepSize: 5,
+            callback: (value) => `${value}`
           },
           grid: {
             color: "rgba(17, 17, 17, 0.08)"
@@ -150,7 +170,7 @@ const buildChart = (rows) => {
           max: 5,
           ticks: {
             color: palette.black,
-            callback: (value) => `$${value}`
+            callback: (value) => `$${Number(value).toFixed(2)}`
           },
           grid: {
             color: "rgba(17, 17, 17, 0.08)"
