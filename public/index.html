@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>McChickenflation</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Roboto:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="title-group">
+        <span class="brand-chip">McChickenflation</span>
+        <h1 class="site-title">McChickenflation</h1>
+        <p class="site-subtitle">
+          McChicken prices are goin' crazy right now. To put the inflation into McPerspective, we've aggregated data-backed
+          standalone McChicken prices since the original product launch in 1980. Prices reflect the standalone McChicken
+          (excluding any meal deals). Sources are cited wherever primary data was used and any estimates are explained in
+          the notes.
+        </p>
+      </div>
+      <nav class="site-nav">
+        <a href="/about.html">About</a>
+      </nav>
+    </header>
+
+    <main class="content">
+      <section class="chart-card">
+        <div class="chart-header">
+          <h2>McChicken Prices Since the Original Launch in 1980</h2>
+          <div class="legend">
+            <div><span class="legend-dot" aria-hidden="true"></span> Min → Max range</div>
+            <div><span class="legend-emoji" aria-hidden="true">😢</span> Not available</div>
+          </div>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="priceChart" aria-label="McChicken price range chart" role="img"></canvas>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Built to keep McPerspective on price inflation.</span>
+    </footer>
+
+    <script src="/vendor/chart.umd.min.js"></script>
+    <script src="/app.js" defer></script>
+  </body>
+</html>
