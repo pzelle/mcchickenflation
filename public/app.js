@@ -52,26 +52,47 @@ const buildChart = (rows) => {
   const availableRows = rows.filter((row) => row.available !== false && row.minPrice !== null && row.maxPrice !== null);
   const missingRows = rows.filter((row) => row.available === false || row.minPrice === null || row.maxPrice === null);
 
-  const data = availableRows.map((row) => ({
+  const minSeries = availableRows.map((row) => ({
     x: row.year,
-    y: [row.minPrice, row.maxPrice],
+    y: row.minPrice,
     notes: row.notes,
-    sources: buildSources(row)
+    sources: buildSources(row),
+    minPrice: row.minPrice,
+    maxPrice: row.maxPrice
+  }));
+
+  const maxSeries = availableRows.map((row) => ({
+    x: row.year,
+    y: row.maxPrice,
+    notes: row.notes,
+    sources: buildSources(row),
+    minPrice: row.minPrice,
+    maxPrice: row.maxPrice
   }));
 
   return new Chart(chartCanvas, {
-    type: "bar",
+    type: "line",
     data: {
       datasets: [
         {
-          label: "Price range",
-          data,
-          backgroundColor: palette.gold,
+          label: "Min price",
+          data: minSeries,
+          borderColor: palette.green,
+          backgroundColor: "rgba(39, 116, 45, 0.15)",
+          pointBackgroundColor: palette.green,
+          pointRadius: 3,
+          tension: 0.25,
+          fill: false
+        },
+        {
+          label: "Max price",
+          data: maxSeries,
           borderColor: palette.red,
-          borderWidth: 2,
-          borderRadius: 8,
-          barPercentage: 0.8,
-          categoryPercentage: 0.9
+          backgroundColor: "rgba(219, 16, 32, 0.18)",
+          pointBackgroundColor: palette.red,
+          pointRadius: 3,
+          tension: 0.25,
+          fill: "-1"
         }
       ]
     },
@@ -81,15 +102,17 @@ const buildChart = (rows) => {
       parsing: false,
       plugins: {
         legend: {
-          display: false
+          display: true,
+          labels: {
+            color: palette.black,
+            usePointStyle: true
+          }
         },
         tooltip: {
           callbacks: {
             label: (context) => {
               const value = context.raw;
-              const min = Array.isArray(value.y) ? value.y[0] : null;
-              const max = Array.isArray(value.y) ? value.y[1] : null;
-              return `Range: ${formatPrice(min)} – ${formatPrice(max)}`;
+              return `Range: ${formatPrice(value.minPrice)} – ${formatPrice(value.maxPrice)}`;
             },
             afterLabel: (context) => {
               const value = context.raw;
