@@ -154,10 +154,39 @@ const buildChart = (rows) => {
     tooltipEl.style.top = `${positionY + tooltip.caretY}px`;
   };
 
+  const hoverSeries = allYears.map((year) => {
+    const row = rowByYear.get(year);
+    if (!row) {
+      return { x: year, y: 0, ...withMeta(null, year) };
+    }
+
+    const fallbackValue = row.minPrice ?? row.maxPrice ?? 0;
+    return {
+      x: year,
+      y: row.available === false ? 0 : fallbackValue,
+      notes: row.notes,
+      sources: buildSources(row),
+      minPrice: row.minPrice ?? null,
+      maxPrice: row.maxPrice ?? null,
+      available: row.available
+    };
+  });
+
   const chartInstance = new Chart(chartCanvas, {
     type: "line",
     data: {
       datasets: [
+        {
+          label: "Hover targets",
+          data: hoverSeries,
+          showLine: false,
+          pointRadius: 0,
+          pointHoverRadius: 6,
+          hitRadius: 12,
+          borderColor: "rgba(0, 0, 0, 0)",
+          backgroundColor: "rgba(0, 0, 0, 0)",
+          order: 0
+        },
         {
           label: "Min price",
           data: minSeries,
@@ -186,6 +215,10 @@ const buildChart = (rows) => {
       responsive: true,
       maintainAspectRatio: false,
       parsing: false,
+      interaction: {
+        mode: "nearest",
+        intersect: false
+      },
       plugins: {
         legend: {
           display: true,

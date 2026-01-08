@@ -63,11 +63,11 @@ const normalizeBoolean = (value) => {
 
   const normalized = String(value).trim().toLowerCase();
 
-  if (["true", "yes", "y", "1"].includes(normalized)) {
+  if (["true", "yes", "y", "1", "available"].includes(normalized)) {
     return true;
   }
 
-  if (["false", "no", "n", "0"].includes(normalized)) {
+  if (["false", "no", "n", "0", "not available"].includes(normalized)) {
     return false;
   }
 
