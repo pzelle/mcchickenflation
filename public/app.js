@@ -71,41 +71,44 @@ const missingMarkerPlugin = {
 };
 
 const buildChart = (rows) => {
-  const availableRows = rows.filter((row) => row.available !== false && row.minPrice !== null && row.maxPrice !== null);
-  const missingRows = rows.filter((row) => row.available === false || row.minPrice === null || row.maxPrice === null);
   const allYears = rows.map((row) => row.year).sort((a, b) => a - b);
-
   const rowByYear = new Map(rows.map((row) => [row.year, row]));
+
+  const notAvailableYears = rows
+    .filter((row) => row.available === false)
+    .map((row) => row.year);
+
+  const withMeta = (row, year) => ({
+    x: year,
+    y: row ? row.minPrice : null,
+    notes: row?.notes,
+    sources: row ? buildSources(row) : "No sources listed.",
+    minPrice: row?.minPrice ?? null,
+    maxPrice: row?.maxPrice ?? null,
+    available: row?.available
+  });
 
   const minSeries = allYears.map((year) => {
     const row = rowByYear.get(year);
-    if (!row || row.available === false || row.minPrice === null || row.maxPrice === null) {
-      return { x: year, y: null };
+    if (!row) {
+      return withMeta(null, year);
     }
 
     return {
-      x: year,
-      y: row.minPrice,
-      notes: row.notes,
-      sources: buildSources(row),
-      minPrice: row.minPrice,
-      maxPrice: row.maxPrice
+      ...withMeta(row, year),
+      y: row.available === false || row.minPrice === null ? null : row.minPrice
     };
   });
 
   const maxSeries = allYears.map((year) => {
     const row = rowByYear.get(year);
-    if (!row || row.available === false || row.minPrice === null || row.maxPrice === null) {
-      return { x: year, y: null };
+    if (!row) {
+      return withMeta(null, year);
     }
 
     return {
-      x: year,
-      y: row.maxPrice,
-      notes: row.notes,
-      sources: buildSources(row),
-      minPrice: row.minPrice,
-      maxPrice: row.maxPrice
+      ...withMeta(row, year),
+      y: row.available === false || row.maxPrice === null ? null : row.maxPrice
     };
   });
 
@@ -133,11 +136,14 @@ const buildChart = (rows) => {
     const year = raw.x ? String(raw.x) : "";
     const notes = raw.notes ? linkifyText(raw.notes) : "None";
     const sources = raw.sources ? linkifyText(raw.sources) : "No sources listed.";
+    const availability =
+      raw.available === false ? "Not Available" : raw.available === true ? "Available" : "Unspecified";
     const range = `Range: ${formatPrice(raw.minPrice)} – ${formatPrice(raw.maxPrice)}`;
 
     content.innerHTML = `
       <div class="tooltip-title">${year}</div>
       <div class="tooltip-range">${range}</div>
+      <div class="tooltip-section"><strong>Availability:</strong> ${availability}</div>
       <div class="tooltip-section"><strong>Notes:</strong> ${notes}</div>
       <div class="tooltip-section"><strong>Sources:</strong> ${sources}</div>
     `;
@@ -161,7 +167,7 @@ const buildChart = (rows) => {
           pointRadius: 3,
           tension: 0.25,
           fill: false,
-          spanGaps: false
+          spanGaps: true
         },
         {
           label: "Max price",
@@ -172,7 +178,7 @@ const buildChart = (rows) => {
           pointRadius: 3,
           tension: 0.25,
           fill: "-1",
-          spanGaps: false
+          spanGaps: true
         }
       ]
     },
@@ -193,7 +199,7 @@ const buildChart = (rows) => {
           external: externalTooltipHandler
         },
         missingMarkerPlugin: {
-          missingYears: missingRows.map((row) => row.year)
+          missingYears: notAvailableYears
         }
       },
       scales: {

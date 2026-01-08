@@ -26,13 +26,13 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "https://cdn.jsdelivr.net"],
-        scriptSrcElem: ["'self'", "https://cdn.jsdelivr.net"],
+        scriptSrc: ["'self'", "https://cdn.jsdelivr.net", "https://va.vercel-scripts.com"],
+        scriptSrcElem: ["'self'", "https://cdn.jsdelivr.net", "https://va.vercel-scripts.com"],
         styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
         styleSrcElem: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
         fontSrc: ["'self'", "https://fonts.gstatic.com"],
         imgSrc: ["'self'", "data:"],
-        connectSrc: ["'self'"]
+        connectSrc: ["'self'", "https://vitals.vercel-analytics.com"]
       }
     }
   })
